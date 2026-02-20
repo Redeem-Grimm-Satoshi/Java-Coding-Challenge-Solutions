@@ -19,3 +19,48 @@ You are given a string containing a series of words separated by a hyphen (`-`).
 
 # 4. Code (Java)
 ```java
+package com.app;
+
+import java.util.*;
+
+public class App {
+
+    public String solution(String s) {
+        // TODO: Implement the function that could solve the task
+        
+        //split the string
+        String[] words=s.split("-");
+        
+        //store the splited words so we can manipulate it
+        List<String> results=new ArrayList<>();
+        
+        //loop through the splitedWords and convert it into a char array
+        for(String word:words){
+            
+            //lets check if the word is a letter, if it's true we convert it to a number
+            if(word.length()==1 && Character.isLetter(word.charAt(0))){
+                
+                //convert to number
+                int num=word.charAt(0) - 'a' + 1;
+                results.add(String.valueOf(num));
+              
+                
+            //check if it matches numbers from 0-9 
+            }else if(word.matches("\\d+")){
+                
+                //convert to character
+                char letter=(char)('a' + Integer.parseInt(word)-1);
+                results.add(String.valueOf(letter));
+                
+            }
+            
+        
+                    
+        }
+        
+        
+        
+        //build and join string using - after each word or number
+        return String.join("-",results);
+    }
+}
