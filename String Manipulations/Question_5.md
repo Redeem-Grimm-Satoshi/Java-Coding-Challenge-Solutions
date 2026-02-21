@@ -33,3 +33,42 @@ Your function should return the sum 5 + 10 + 2 + 1, which totals 18.
 ## Java Code
 
 ```java
+package com.app;
+
+import java.util.*;
+
+public class App {
+    public int parseAndSumScores(String s) {
+        // TODO: implement
+        
+        //lets split the string using " "
+        String[] words=s.split(" ");
+        
+        //this array stores the isolated integers...
+        int[] isolatedNumbers=new int[words.length];
+        
+        //lets declare a variable to store the sum
+        int sum=0;
+        
+        //lets loop through the splited words and look for intergers ranging from 0-9 ...lets use for-each instead
+        for(int i=0; i<words.length; i++){
+            
+            //lets use regex "[^0-9]","" to deal with commas when spliting
+            words[i]=words[i].replaceAll("[^0-9]","");
+            
+            //using regex \\d+ to scan for integer values, if it matches, store those numbers to our integer array
+            if(words[i].matches("\\d+")){
+                
+                isolatedNumbers[i]=Integer.parseInt(words[i]);
+                
+                //sum all the elements in the array and pass the value to sum
+                sum+=isolatedNumbers[i];
+                
+                
+            }
+            
+        }
+        
+        return sum;
+    }
+}
