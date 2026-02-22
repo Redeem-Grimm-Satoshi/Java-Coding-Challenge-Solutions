@@ -30,3 +30,46 @@ The operation should maintain the sequential order of the numbers and the rest o
 
 ```Java
 
+public class App {
+    public String solution(String input) {
+        // TODO: implement your solution here
+        
+        
+        StringBuilder results=new StringBuilder();
+        
+        
+        for(int i=0; i<input.length(); i++){
+            
+            
+            if(!Character.isDigit(input.charAt(i))){
+                results.append(input.charAt(i));
+                
+            }else{
+                StringBuilder num=new StringBuilder();
+                
+                while(i<input.length() && Character.isDigit(input.charAt(i))){
+                    num.append(input.charAt(i));
+                    i++;
+                    
+                }
+                
+                while(i<input.length() && !Character.isAlphabetic((input.charAt(i)))){
+                    i++;
+                    
+                }
+                if(i<input.length()){
+                    results.append(input.charAt(i));
+                    results.append(num);
+                    
+                    
+                }
+                
+            }
+            
+            
+        }
+        
+        
+        return results.toString();
+    }
+}
