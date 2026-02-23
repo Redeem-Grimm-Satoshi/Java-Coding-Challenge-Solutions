@@ -74,3 +74,23 @@ For example:
 
 ```java
 
+package com.app;
+
+public class SpecialOrder{
+
+    public String specialOrder(String inputString){
+
+        StringBuilder result=new StringBuilder();
+        int length=inputString.length();
+        for(int i=length; i>=length/2; i--){
+            result.append(inputString.charAt(i));
+        }
+        for(int i=0; i<length/2; i++){
+            result.append((inputString.charAt(i)));
+
+        }
+        return result.toString();
+    }
+
+}
+
