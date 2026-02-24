@@ -60,4 +60,37 @@ Explanation:
 ## Java Code
 
 ```java
+package com.app;
 
+import java.util.ArrayList;
+import java.util.List;
+
+public class App {
+    public List<String> addSecondsToTimes(List<String> timePoints, int addedSeconds) {
+        // TODO: implement the function
+        
+        List<String> result=new ArrayList<>();
+        
+        for(String time: timePoints){
+            String[] parts=time.split(":");
+            int hh=Integer.parseInt(parts[0]);
+            int mm=Integer.parseInt(parts[1]);
+            int ss=Integer.parseInt(parts[2]);
+            
+            int totalSeconds=hh*3600+mm*60+ss;
+            
+            totalSeconds+=addedSeconds;
+            totalSeconds=totalSeconds%86400;
+            
+            int newH=totalSeconds/3600;
+            int newM=(totalSeconds%3600)/60;
+            int newS=totalSeconds%60;
+            
+            String newTime=String.format("%02d:%02d:%02d", newH, newM, newS);
+            result.add(newTime);
+            
+        }
+        
+        
+        return result;
+    }
