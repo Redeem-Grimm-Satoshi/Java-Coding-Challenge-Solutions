@@ -65,3 +65,35 @@ Example:
 ## 4. Java Code
 
 ```java
+package com.app;
+
+public class App {
+
+    public int timePeriodLength(String timePeriod) {
+
+        // Split the start and end times
+        String[] parts = timePeriod.split("\\s*-\\s*");
+
+        String startTime = parts[0];
+        String endTime = parts[1];
+
+        // Convert both times to seconds
+        int startSeconds = convertToSeconds(startTime);
+        int endSeconds = convertToSeconds(endTime);
+
+        // Count minute boundaries crossed
+        return (endSeconds / 60) - (startSeconds / 60);
+    }
+
+    // Helper method: HH:MM:SS -> total seconds
+    private int convertToSeconds(String time) {
+
+        String[] t = time.split(":");
+
+        int hours = Integer.parseInt(t[0]);
+        int minutes = Integer.parseInt(t[1]);
+        int seconds = Integer.parseInt(t[2]);
+
+        return hours * 3600 + minutes * 60 + seconds;
+    }
+}
