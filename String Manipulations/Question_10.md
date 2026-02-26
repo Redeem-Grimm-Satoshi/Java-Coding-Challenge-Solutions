@@ -37,3 +37,50 @@ You are given an initial date as a string in the format `YYYY-MM-DD` and an inte
 ## Java Code
 
 ```java
+package com.app;
+
+public class App {
+
+    // Helper data provided (non-leap year default)
+    private static final int[] DAYS_IN_MONTH =
+            {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+    public String addDays(String date, int n) {
+        int year = Integer.parseInt(date.substring(0, 4));
+        int month = Integer.parseInt(date.substring(5, 7)); // 1..12
+        int day = Integer.parseInt(date.substring(8, 10));  // 1..31
+
+        while (n > 0) {
+            int daysThisMonth = getDaysInMonth(year, month);
+            int remainingInMonth = daysThisMonth - day;
+
+            // If we can finish within the current month
+            if (n <= remainingInMonth) {
+                day += n;
+                n = 0;
+            } else {
+                // Jump to first day of next month
+                n -= (remainingInMonth + 1);
+                day = 1;
+                month++;
+                if (month == 13) {
+                    month = 1;
+                    year++;
+                }
+            }
+        }
+
+        return String.format("%04d-%02d-%02d", year, month, day);
+    }
+
+    private int getDaysInMonth(int year, int month) {
+        if (month == 2 && isLeapYear(year)) return 29;
+        return DAYS_IN_MONTH[month - 1];
+    }
+
+    private boolean isLeapYear(int year) {
+        if (year % 400 == 0) return true;
+        if (year % 100 == 0) return false;
+        return year % 4 == 0;
+    }
+}
