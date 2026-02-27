@@ -1,4 +1,4 @@
-# Date Addition Challenge
+# Add Date
 
 This problem requires calculating a future date by adding a specific number of days to a starting date, while accounting for varying month lengths and leap year rules.
 
@@ -59,7 +59,7 @@ public class App {
                 day += n;
                 n = 0;
             } else {
-                // Jump to first day of next month
+                // Jump to the first day of next month
                 n -= (remainingInMonth + 1);
                 day = 1;
                 month++;
