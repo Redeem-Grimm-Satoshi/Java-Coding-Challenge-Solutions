@@ -61,3 +61,70 @@ Two lists of equal size:
 # 4. Java Code
 
 ```java
+```java
+import java.util.*;
+import java.util.regex.*;
+
+public class Solution {
+
+    public static List<String> reverseReplace(List<String> sentences, List<String> words) {
+        int n = sentences.size();
+        List<String> result = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            String sentence = sentences.get(i);
+            String word = words.get(i);
+
+            // Reverse the word
+            String reversed = new StringBuilder(word).reverse().toString();
+
+            // Case-insensitive regex pattern
+            Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(word));
+            Matcher matcher = pattern.matcher(sentence);
+
+            // If no occurrence, keep sentence unchanged
+            if (!matcher.find()) {
+                result.add(sentence);
+                continue;
+            }
+
+            matcher.reset();
+            StringBuffer sb = new StringBuffer();
+
+            while (matcher.find()) {
+                String found = matcher.group();
+
+                // Preserve first letter capitalization
+                String replacement = reversed;
+                if (Character.isUpperCase(found.charAt(0))) {
+                    replacement = Character.toUpperCase(reversed.charAt(0)) + reversed.substring(1);
+                }
+
+                matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+            }
+
+            matcher.appendTail(sb);
+            result.add(sb.toString());
+        }
+
+        return result;
+    }
+
+    // Example usage
+    public static void main(String[] args) {
+
+        List<String> sentences = Arrays.asList(
+                "this is a simple example.",
+                "the name is bond. james bond.",
+                "remove every single e"
+        );
+
+        List<String> words = Arrays.asList("simple", "bond", "e");
+
+        List<String> output = reverseReplace(sentences, words);
+
+        for (String s : output) {
+            System.out.println(s);
+        }
+    }
+}
