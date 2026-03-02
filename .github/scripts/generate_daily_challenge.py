@@ -1,0 +1,152 @@
+#!/usr/bin/env python3
+from pathlib import Path
+import os
+
+DATE = os.environ["DATE"]
+I = int(os.environ["I"])
+
+challenges = [
+    {
+        "topic": "Arrays", "difficulty": "Easy", "method": "maxSubarraySum",
+        "problem": "Given an integer array, return the maximum subarray sum using Kadane's algorithm.",
+        "constraints": ["1 <= n <= 100000", "-10^9 <= arr[i] <= 10^9"],
+        "example_in": "[-2,1,-3,4,-1,2,1,-5,4]", "example_out": "6",
+        "explanation": "The subarray [4,-1,2,1] has sum 6.",
+        "signature": "int[] arr", "ret": "int", "sample": "int[] sample = {-2,1,-3,4,-1,2,1,-5,4};",
+        "call": "maxSubarraySum(sample)",
+        "body": "int best = arr[0], curr = arr[0];\n        for (int k = 1; k < arr.length; k++) {\n            curr = Math.max(arr[k], curr + arr[k]);\n            best = Math.max(best, curr);\n        }\n        return best;"
+    },
+    {
+        "topic": "Strings", "difficulty": "Easy", "method": "isValidPalindrome",
+        "problem": "Given a string, return true if it is a palindrome after removing non-alphanumeric chars and ignoring case.",
+        "constraints": ["1 <= s.length <= 200000"],
+        "example_in": "A man, a plan, a canal: Panama", "example_out": "true",
+        "explanation": "After cleanup: amanaplanacanalpanama, which is a palindrome.",
+        "signature": "String s", "ret": "boolean", "sample": "String sample = \"A man, a plan, a canal: Panama\";",
+        "call": "isValidPalindrome(sample)",
+        "body": "int l = 0, r = s.length() - 1;\n        while (l < r) {\n            while (l < r && !Character.isLetterOrDigit(s.charAt(l))) l++;\n            while (l < r && !Character.isLetterOrDigit(s.charAt(r))) r--;\n            if (Character.toLowerCase(s.charAt(l)) != Character.toLowerCase(s.charAt(r))) return false;\n            l++; r--;\n        }\n        return true;"
+    },
+    {
+        "topic": "Hashing", "difficulty": "Easy", "method": "twoSum",
+        "problem": "Given an integer array and target, return indices of two numbers that add up to target.",
+        "constraints": ["2 <= n <= 100000"],
+        "example_in": "nums=[2,7,11,15], target=9", "example_out": "[0,1]",
+        "explanation": "nums[0] + nums[1] = 9.",
+        "signature": "int[] nums, int target", "ret": "int[]", "sample": "int[] nums = {2,7,11,15}; int target = 9;",
+        "call": "java.util.Arrays.toString(twoSum(nums, target))",
+        "body": "java.util.Map<Integer, Integer> map = new java.util.HashMap<>();\n        for (int k = 0; k < nums.length; k++) {\n            int need = target - nums[k];\n            if (map.containsKey(need)) return new int[]{map.get(need), k};\n            map.put(nums[k], k);\n        }\n        return new int[]{-1, -1};"
+    },
+    {
+        "topic": "Two Pointers", "difficulty": "Medium", "method": "removeDuplicates",
+        "problem": "Given a sorted array, remove duplicates in-place and return the new length.",
+        "constraints": ["1 <= n <= 100000"],
+        "example_in": "[0,0,1,1,1,2,2,3,3,4]", "example_out": "5",
+        "explanation": "Array starts with [0,1,2,3,4] after deduplication.",
+        "signature": "int[] nums", "ret": "int", "sample": "int[] nums = {0,0,1,1,1,2,2,3,3,4};",
+        "call": "removeDuplicates(nums)",
+        "body": "if (nums.length == 0) return 0;\n        int w = 1;\n        for (int r = 1; r < nums.length; r++) {\n            if (nums[r] != nums[r - 1]) nums[w++] = nums[r];\n        }\n        return w;"
+    },
+    {
+        "topic": "Sliding Window", "difficulty": "Medium", "method": "lengthOfLongestSubstring",
+        "problem": "Given a string s, return length of the longest substring without repeating characters.",
+        "constraints": ["0 <= s.length <= 100000"],
+        "example_in": "abcabcbb", "example_out": "3",
+        "explanation": "abc is the longest substring without duplicates.",
+        "signature": "String s", "ret": "int", "sample": "String sample = \"abcabcbb\";",
+        "call": "lengthOfLongestSubstring(sample)",
+        "body": "int[] last = new int[128];\n        java.util.Arrays.fill(last, -1);\n        int left = 0, best = 0;\n        for (int r = 0; r < s.length(); r++) {\n            char c = s.charAt(r);\n            left = Math.max(left, last[c] + 1);\n            last[c] = r;\n            best = Math.max(best, r - left + 1);\n        }\n        return best;"
+    },
+    {
+        "topic": "Recursion", "difficulty": "Medium", "method": "fib",
+        "problem": "Given n, return n-th Fibonacci number using top-down memoization.",
+        "constraints": ["0 <= n <= 45"],
+        "example_in": "n=10", "example_out": "55",
+        "explanation": "F(10)=55.",
+        "signature": "int n", "ret": "int", "sample": "int sample = 10;",
+        "call": "fib(sample)",
+        "body": "int[] memo = new int[n + 1];\n        java.util.Arrays.fill(memo, -1);\n        return dfs(n, memo);",
+        "extra": "    private static int dfs(int n, int[] memo) {\n        if (n <= 1) return n;\n        if (memo[n] != -1) return memo[n];\n        memo[n] = dfs(n - 1, memo) + dfs(n - 2, memo);\n        return memo[n];\n    }\n"
+    },
+    {
+        "topic": "Stack", "difficulty": "Medium", "method": "isValidBrackets",
+        "problem": "Given a string containing only brackets, determine if it is valid.",
+        "constraints": ["1 <= s.length <= 100000"],
+        "example_in": "()[]{}", "example_out": "true",
+        "explanation": "All brackets are balanced and correctly nested.",
+        "signature": "String s", "ret": "boolean", "sample": "String sample = \"()[]{}\";",
+        "call": "isValidBrackets(sample)",
+        "body": "java.util.Deque<Character> st = new java.util.ArrayDeque<>();\n        for (char c : s.toCharArray()) {\n            if (c == '(' || c == '[' || c == '{') st.push(c);\n            else {\n                if (st.isEmpty()) return false;\n                char p = st.pop();\n                if ((c == ')' && p != '(') || (c == ']' && p != '[') || (c == '}' && p != '{')) return false;\n            }\n        }\n        return st.isEmpty();"
+    },
+    {
+        "topic": "Queue", "difficulty": "Medium", "method": "movingAverage",
+        "problem": "Implement a moving average over a data stream with fixed window size k.",
+        "constraints": ["1 <= k <= 10000"],
+        "example_in": "k=3, stream=[1,10,3,5]", "example_out": "[1.0, 5.5, 4.67, 6.0]",
+        "explanation": "Average of the last k elements at each step.",
+        "signature": "int[] arr, int k", "ret": "java.util.List<Double>", "sample": "int[] arr = {1,10,3,5}; int k = 3;",
+        "call": "movingAverage(arr, k)",
+        "body": "java.util.List<Double> out = new java.util.ArrayList<>();\n        java.util.ArrayDeque<Integer> q = new java.util.ArrayDeque<>();\n        long sum = 0;\n        for (int x : arr) {\n            q.offer(x);\n            sum += x;\n            if (q.size() > k) sum -= q.poll();\n            out.add(sum * 1.0 / q.size());\n        }\n        return out;"
+    },
+    {
+        "topic": "Binary Search", "difficulty": "Medium", "method": "search",
+        "problem": "Given a sorted array and target, return index if found else -1.",
+        "constraints": ["1 <= n <= 1000000"],
+        "example_in": "nums=[-1,0,3,5,9,12], target=9", "example_out": "4",
+        "explanation": "9 exists at index 4.",
+        "signature": "int[] nums, int target", "ret": "int", "sample": "int[] nums = {-1,0,3,5,9,12}; int target = 9;",
+        "call": "search(nums, target)",
+        "body": "int l = 0, r = nums.length - 1;\n        while (l <= r) {\n            int m = l + (r - l) / 2;\n            if (nums[m] == target) return m;\n            if (nums[m] < target) l = m + 1;\n            else r = m - 1;\n        }\n        return -1;"
+    },
+    {
+        "topic": "Dynamic Programming", "difficulty": "Hard", "method": "coinChange",
+        "problem": "Given coins and amount, return minimum number of coins to make amount; return -1 if impossible.",
+        "constraints": ["1 <= coins.length <= 100", "0 <= amount <= 10000"],
+        "example_in": "coins=[1,2,5], amount=11", "example_out": "3",
+        "explanation": "11 = 5 + 5 + 1.",
+        "signature": "int[] coins, int amount", "ret": "int", "sample": "int[] coins = {1,2,5}; int amount = 11;",
+        "call": "coinChange(coins, amount)",
+        "body": "int INF = amount + 1;\n        int[] dp = new int[amount + 1];\n        java.util.Arrays.fill(dp, INF);\n        dp[0] = 0;\n        for (int a = 1; a <= amount; a++) {\n            for (int c : coins) {\n                if (a - c >= 0) dp[a] = Math.min(dp[a], dp[a - c] + 1);\n            }\n        }\n        return dp[amount] == INF ? -1 : dp[amount];"
+    }
+]
+
+c = challenges[I - 1]
+title = f"Java Coding Challenge #{I}"
+folder = Path("Daily Challenges") / DATE / c["topic"]
+folder.mkdir(parents=True, exist_ok=True)
+qfile = folder / f"Question_{I}.md"
+sfile = folder / f"Solution_{I}.java"
+
+qtext = "\n".join([
+    f"# {title}", "",
+    f"**Topic:** {c['topic']}",
+    f"**Difficulty:** {c['difficulty']}", "",
+    "## Problem", c["problem"], "",
+    "## Constraints", *[f"- {x}" for x in c["constraints"]], "",
+    "## Example",
+    f"Input: {c['example_in']}",
+    f"Output: {c['example_out']}",
+    f"Explanation: {c['explanation']}", "",
+    "## Approach",
+    "Use an optimal Java solution with clean naming and clear logic."
+]) + "\n"
+
+extra = c.get("extra", "")
+java = f"""package com.app;
+
+public class Solution_{I} {{
+    public static {c['ret']} {c['method']}({c['signature']}) {{
+        {c['body']}
+    }}
+
+{extra}    public static void main(String[] args) {{
+        {c['sample']}
+        System.out.println({c['call']});
+    }}
+}}
+"""
+
+qfile.write_text(qtext, encoding="utf-8")
+sfile.write_text(java, encoding="utf-8")
+print(c["topic"])
+print(qfile.as_posix())
+print(sfile.as_posix())
