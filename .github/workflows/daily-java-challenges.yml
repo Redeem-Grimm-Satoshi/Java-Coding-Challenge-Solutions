@@ -1,0 +1,117 @@
+name: Daily Java Coding Challenges
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 10:05 AM America/New_York (adjust seasonally with UTC offset)
+    - cron: '5 15 * * *'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  generate-prs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.AUTOBOT_TOKEN }}
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "Redeem Grimm Bot"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Generate, PR, and merge 10 daily challenges
+        env:
+          GH_TOKEN: ${{ secrets.AUTOBOT_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          DATE=$(TZ=America/New_York date +%F)
+          BASE=main
+
+          for i in $(seq 1 10); do
+            git fetch origin "$BASE"
+            git checkout -B "$BASE" "origin/$BASE"
+
+            BRANCH="daily/${DATE}-q${i}"
+            git checkout -B "$BRANCH"
+
+            DIR="Daily Challenges/${DATE}"
+            mkdir -p "$DIR"
+            QFILE="$DIR/Question_${i}.md"
+            SFILE="$DIR/Solution_${i}.java"
+
+            if [[ -f "$QFILE" ]]; then
+              echo "Question $i already exists for $DATE. Skipping."
+              continue
+            fi
+
+            TITLE="Java Coding Challenge #${i}"
+
+            cat > "$QFILE" <<EOF
+# ${TITLE}
+
+## Problem
+Given a non-empty integer array, return the maximum difference \(arr[j] - arr[i]\) such that \(j > i\).
+
+## Constraints
+- 2 <= n <= 100000
+- -10^9 <= arr[i] <= 10^9
+
+## Example
+Input: [7, 1, 5, 3, 6, 4]
+Output: 5
+Explanation: Buy at 1 and sell at 6.
+
+## Approach
+Track the smallest value seen so far and compute best difference at each step.
+EOF
+
+            cat > "$SFILE" <<EOF
+package com.app;
+
+public class Solution_${i} {
+    public static int maxDifference(int[] arr) {
+        int min = arr[0];
+        int best = Integer.MIN_VALUE;
+
+        for (int k = 1; k < arr.length; k++) {
+            best = Math.max(best, arr[k] - min);
+            min = Math.min(min, arr[k]);
+        }
+        return best;
+    }
+
+    public static void main(String[] args) {
+        int[] sample = {7, 1, 5, 3, 6, 4};
+        System.out.println(maxDifference(sample));
+    }
+}
+EOF
+
+            git add "$QFILE" "$SFILE"
+            git commit -m "feat(java-challenge): add ${DATE} challenge ${i} with solution"
+            git push -u origin "$BRANCH"
+
+            PR_NUMBER=$(gh pr list --head "$BRANCH" --base "$BASE" --json number --jq '.[0].number // empty')
+
+            if [[ -z "$PR_NUMBER" ]]; then
+              gh pr create \
+                --base "$BASE" \
+                --head "$BRANCH" \
+                --title "feat: add Java coding challenge ${i} (${DATE})" \
+                --body "Automated daily Java coding challenge with problem statement and solution." \
+                --label "automation" || true
+
+              PR_NUMBER=$(gh pr list --head "$BRANCH" --base "$BASE" --json number --jq '.[0].number // empty')
+            fi
+
+            if [[ -n "$PR_NUMBER" ]]; then
+              gh pr merge "$PR_NUMBER" --squash --delete-branch || gh pr merge "$PR_NUMBER" --squash --delete-branch --admin
+            fi
+          done
