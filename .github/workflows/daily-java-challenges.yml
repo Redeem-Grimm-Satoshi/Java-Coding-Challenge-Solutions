@@ -29,7 +29,6 @@ jobs:
           GH_TOKEN: ${{ secrets.AUTOBOT_TOKEN != '' && secrets.AUTOBOT_TOKEN || github.token }}
         run: |
           set -euo pipefail
-
           DATE=$(TZ=America/New_York date +%F)
           BASE=main
 
@@ -52,60 +51,58 @@ jobs:
 
             TITLE="Java Coding Challenge #${i}"
 
-            cat > "$QFILE" <<EOF
-# ${TITLE}
+            printf '%s\n' \
+              "# ${TITLE}" \
+              "" \
+              "## Problem" \
+              "Given a non-empty integer array, return the maximum difference (arr[j] - arr[i]) such that j > i." \
+              "" \
+              "## Constraints" \
+              "- 2 <= n <= 100000" \
+              "- -10^9 <= arr[i] <= 10^9" \
+              "" \
+              "## Example" \
+              "Input: [7, 1, 5, 3, 6, 4]" \
+              "Output: 5" \
+              "Explanation: Buy at 1 and sell at 6." \
+              "" \
+              "## Approach" \
+              "Track the smallest value seen so far and compute best difference at each step." \
+              > "$QFILE"
 
-## Problem
-Given a non-empty integer array, return the maximum difference (arr[j] - arr[i]) such that j > i.
-
-## Constraints
-- 2 <= n <= 100000
-- -10^9 <= arr[i] <= 10^9
-
-## Example
-Input: [7, 1, 5, 3, 6, 4]
-Output: 5
-Explanation: Buy at 1 and sell at 6.
-
-## Approach
-Track the smallest value seen so far and compute best difference at each step.
-EOF
-
-            cat > "$SFILE" <<EOF
-package com.app;
-
-public class Solution_${i} {
-    public static int maxDifference(int[] arr) {
-        int min = arr[0];
-        int best = Integer.MIN_VALUE;
-
-        for (int k = 1; k < arr.length; k++) {
-            best = Math.max(best, arr[k] - min);
-            min = Math.min(min, arr[k]);
-        }
-        return best;
-    }
-
-    public static void main(String[] args) {
-        int[] sample = {7, 1, 5, 3, 6, 4};
-        System.out.println(maxDifference(sample));
-    }
-}
-EOF
+            printf '%s\n' \
+              "package com.app;" \
+              "" \
+              "public class Solution_${i} {" \
+              "    public static int maxDifference(int[] arr) {" \
+              "        int min = arr[0];" \
+              "        int best = Integer.MIN_VALUE;" \
+              "" \
+              "        for (int k = 1; k < arr.length; k++) {" \
+              "            best = Math.max(best, arr[k] - min);" \
+              "            min = Math.min(min, arr[k]);" \
+              "        }" \
+              "        return best;" \
+              "    }" \
+              "" \
+              "    public static void main(String[] args) {" \
+              "        int[] sample = {7, 1, 5, 3, 6, 4};" \
+              "        System.out.println(maxDifference(sample));" \
+              "    }" \
+              "}" \
+              > "$SFILE"
 
             git add "$QFILE" "$SFILE"
             git commit -m "feat(java-challenge): add ${DATE} challenge ${i} with solution"
             git push -u origin "$BRANCH"
 
             PR_NUMBER=$(gh pr list --head "$BRANCH" --base "$BASE" --json number --jq '.[0].number // empty')
-
             if [[ -z "$PR_NUMBER" ]]; then
               gh pr create \
                 --base "$BASE" \
                 --head "$BRANCH" \
                 --title "feat: add Java coding challenge ${i} (${DATE})" \
                 --body "Automated daily Java coding challenge with problem statement and solution." || true
-
               PR_NUMBER=$(gh pr list --head "$BRANCH" --base "$BASE" --json number --jq '.[0].number // empty')
             fi
 
