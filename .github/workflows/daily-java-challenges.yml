@@ -17,7 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.AUTOBOT_TOKEN }}
+          token: ${{ secrets.AUTOBOT_TOKEN || github.token }}
           fetch-depth: 0
 
       - name: Configure Git
@@ -27,7 +27,7 @@ jobs:
 
       - name: Generate, PR, and merge 10 daily challenges
         env:
-          GH_TOKEN: ${{ secrets.AUTOBOT_TOKEN }}
+          GH_TOKEN: ${{ secrets.AUTOBOT_TOKEN || github.token }}
         run: |
           set -euo pipefail
 
@@ -105,8 +105,7 @@ EOF
                 --base "$BASE" \
                 --head "$BRANCH" \
                 --title "feat: add Java coding challenge ${i} (${DATE})" \
-                --body "Automated daily Java coding challenge with problem statement and solution." \
-                --label "automation" || true
+                --body "Automated daily Java coding challenge with problem statement and solution." || true
 
               PR_NUMBER=$(gh pr list --head "$BRANCH" --base "$BASE" --json number --jq '.[0].number // empty')
             fi
