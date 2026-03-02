@@ -3,7 +3,6 @@ name: Daily Java Coding Challenges
 on:
   workflow_dispatch:
   schedule:
-    # 10:05 AM America/New_York (adjust seasonally with UTC offset)
     - cron: '5 15 * * *'
 
 permissions:
@@ -17,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.AUTOBOT_TOKEN || github.token }}
+          token: ${{ secrets.AUTOBOT_TOKEN != '' && secrets.AUTOBOT_TOKEN || github.token }}
           fetch-depth: 0
 
       - name: Configure Git
@@ -27,7 +26,7 @@ jobs:
 
       - name: Generate, PR, and merge 10 daily challenges
         env:
-          GH_TOKEN: ${{ secrets.AUTOBOT_TOKEN || github.token }}
+          GH_TOKEN: ${{ secrets.AUTOBOT_TOKEN != '' && secrets.AUTOBOT_TOKEN || github.token }}
         run: |
           set -euo pipefail
 
@@ -53,46 +52,50 @@ jobs:
 
             TITLE="Java Coding Challenge #${i}"
 
-            cat > "$QFILE" <<EOF
-# ${TITLE}
+            cat > "$QFILE" <<'EOF'
+            # __TITLE__
 
-## Problem
-Given a non-empty integer array, return the maximum difference \(arr[j] - arr[i]\) such that \(j > i\).
+            ## Problem
+            Given a non-empty integer array, return the maximum difference (arr[j] - arr[i]) such that j > i.
 
-## Constraints
-- 2 <= n <= 100000
-- -10^9 <= arr[i] <= 10^9
+            ## Constraints
+            - 2 <= n <= 100000
+            - -10^9 <= arr[i] <= 10^9
 
-## Example
-Input: [7, 1, 5, 3, 6, 4]
-Output: 5
-Explanation: Buy at 1 and sell at 6.
+            ## Example
+            Input: [7, 1, 5, 3, 6, 4]
+            Output: 5
+            Explanation: Buy at 1 and sell at 6.
 
-## Approach
-Track the smallest value seen so far and compute best difference at each step.
-EOF
+            ## Approach
+            Track the smallest value seen so far and compute best difference at each step.
+            EOF
+            sed -i "s/__TITLE__/${TITLE}/g" "$QFILE"
+            sed -i 's/^            //' "$QFILE"
 
-            cat > "$SFILE" <<EOF
-package com.app;
+            cat > "$SFILE" <<'EOF'
+            package com.app;
 
-public class Solution_${i} {
-    public static int maxDifference(int[] arr) {
-        int min = arr[0];
-        int best = Integer.MIN_VALUE;
+            public class Solution___I__ {
+                public static int maxDifference(int[] arr) {
+                    int min = arr[0];
+                    int best = Integer.MIN_VALUE;
 
-        for (int k = 1; k < arr.length; k++) {
-            best = Math.max(best, arr[k] - min);
-            min = Math.min(min, arr[k]);
-        }
-        return best;
-    }
+                    for (int k = 1; k < arr.length; k++) {
+                        best = Math.max(best, arr[k] - min);
+                        min = Math.min(min, arr[k]);
+                    }
+                    return best;
+                }
 
-    public static void main(String[] args) {
-        int[] sample = {7, 1, 5, 3, 6, 4};
-        System.out.println(maxDifference(sample));
-    }
-}
-EOF
+                public static void main(String[] args) {
+                    int[] sample = {7, 1, 5, 3, 6, 4};
+                    System.out.println(maxDifference(sample));
+                }
+            }
+            EOF
+            sed -i "s/__I__/${i}/g" "$SFILE"
+            sed -i 's/^            //' "$SFILE"
 
             git add "$QFILE" "$SFILE"
             git commit -m "feat(java-challenge): add ${DATE} challenge ${i} with solution"
